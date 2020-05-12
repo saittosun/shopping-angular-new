@@ -9,6 +9,7 @@ import { Component, OnInit, Input } from '@angular/core';
 export class RecipeItemComponent implements OnInit {
   // @input allows us to bind this component property from outside
   @Input() recipe: Recipe;
+  @Input() index: number;
   constructor() { }
 
   ngOnInit(): void {
