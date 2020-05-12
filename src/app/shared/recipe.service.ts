@@ -2,12 +2,13 @@ import { Injectable, EventEmitter } from '@angular/core';
 import { Recipe } from './../recipe/recipe.model';
 import { Ingredient } from './ingredient.model';
 import { ShoppingListService } from './shopping-list.service';
+// import { Subject } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
 })
 export class RecipeService {
-  recipeSelected = new EventEmitter<Recipe>();
+  // recipeSelected = new Subject<Recipe>();
 
   private recipes: Recipe[] = [
     new Recipe(
