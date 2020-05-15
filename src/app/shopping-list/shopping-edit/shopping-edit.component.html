@@ -32,7 +32,7 @@
           <button
             class="btn btn-success"
             type="submit"
-            [disabled]="!f.valid">add</button>
+            [disabled]="!f.valid">{{editMode ? 'update': 'add'}}</button>
           <button
             class="btn btn-danger"
             type="button"
