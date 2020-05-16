@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Params } from '@angular/router';
-import { FormGroup, FormControl, FormArray } from '@angular/forms';
+import { FormGroup, FormControl, FormArray, Validators } from '@angular/forms';
 import { RecipeService } from './../../shared/recipe.service';
 
 @Component({
@@ -20,7 +20,7 @@ export class RecipeEditComponent implements OnInit {
     this.route.params.subscribe(
       (params: Params) => {
         this.id = +params.id;
-        this.editMode = params['id'] != null;
+        this.editMode = params.id != null;
         console.log(this.editMode);
         this.initForm();
       }
@@ -34,23 +34,26 @@ export class RecipeEditComponent implements OnInit {
   onAddIngredient() {
     // tslint:disable-next-line:max-line-length
     // I can simply do this by accessing my recipe form, there I can get my ingredients control and I know that this will be a formArray but Angular or TypeScript to be precise doesn't know this. So I will explicitly cast it with this cast command here basically by enclosing the type I want to convert it to between smaller and greater than signs and then enclosing this all in parentheses and now the part here between the parentheses is treated like a formArray.
-    (<FormArray>this.recipeForm.get('ingredients')).push(
+    (this.recipeForm.get('ingredients') as FormArray).push(
       new FormGroup({
-        'name': new FormControl(),
-        'amount': new FormControl()
+        name: new FormControl(null, Validators.required),
+        amount: new FormControl(null, [
+          Validators.required,
+          Validators.pattern(/^[1-9]+[0-9]*$/)
+        ])
       })
-    )
+    );
   }
 
   get controls() { // a getter!
-    return (<FormArray>this.recipeForm.get('ingredients')).controls;
+    return (this.recipeForm.get('ingredients') as FormArray).controls;
   }
 
   private initForm() {
     let recipeName = '';
     let recipeImagePath = '';
     let recipeDescription = '';
-    let recipeIngredients = new FormArray([])
+    const recipeIngredients = new FormArray([]);
 
     if (this.editMode) {
       const recipe = this.recipeService.getRecipe(this.id);
@@ -59,22 +62,25 @@ export class RecipeEditComponent implements OnInit {
       recipeDescription = recipe.description;
       // tslint:disable-next-line:max-line-length
       // we will simply need to check if we have any ingredients to begin with because theoretically, you could create a recipe without ingredients. So here what I want to do is I want to check if my recipe which I loaded, if it does have ingredients,so if that is defined, I know I can safely use them.
-      if (recipe['ingredients']) {
-        for (let ingredient of recipe.ingredients) {
+      if (recipe.ingredients) {
+        for (const ingredient of recipe.ingredients) {
           recipeIngredients.push(
             new FormGroup({
-              'name': new FormControl(ingredient.name),
-              'amount': new FormControl(ingredient.amount)
+              name: new FormControl(ingredient.name, Validators.required),
+              amount: new FormControl(ingredient.amount, [
+                Validators.required,
+                Validators.pattern(/^[1-9]+[0-9]*$/)
+              ])
             })
           );
         }
       }
     }
     this.recipeForm = new FormGroup({
-      'name': new FormControl(recipeName),
-      'imagePath': new FormControl(recipeImagePath),
-      'description': new FormControl(recipeDescription),
-      'ingredients': recipeIngredients
+      name: new FormControl(recipeName, Validators.required),
+      imagePath: new FormControl(recipeImagePath, Validators.required),
+      description: new FormControl(recipeDescription, Validators.required),
+      ingredients: recipeIngredients
     });
   }
 
