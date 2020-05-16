@@ -31,6 +31,17 @@ export class RecipeEditComponent implements OnInit {
     console.log(this.recipeForm);
   }
 
+  onAddIngredient() {
+    // tslint:disable-next-line:max-line-length
+    // I can simply do this by accessing my recipe form, there I can get my ingredients control and I know that this will be a formArray but Angular or TypeScript to be precise doesn't know this. So I will explicitly cast it with this cast command here basically by enclosing the type I want to convert it to between smaller and greater than signs and then enclosing this all in parentheses and now the part here between the parentheses is treated like a formArray.
+    (<FormArray>this.recipeForm.get('ingredients')).push(
+      new FormGroup({
+        'name': new FormControl(),
+        'amount': new FormControl()
+      })
+    )
+  }
+
   get controls() { // a getter!
     return (<FormArray>this.recipeForm.get('ingredients')).controls;
   }
