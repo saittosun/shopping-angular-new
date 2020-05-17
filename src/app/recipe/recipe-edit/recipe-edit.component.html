@@ -7,7 +7,10 @@
             type="submit"
             class="btn btn-success"
             [disabled]="!recipeForm.valid">Save</button>
-          <button type="button" class="btn btn-danger">Cancel</button>
+          <button
+            type="button"
+            class="btn btn-danger"
+            (click)="onCancel()">Cancel</button>
         </div>
       </div>
       <div class="row">
@@ -26,17 +29,19 @@
         <div class="col-sm-12">
           <div class="form-group">
             <label for="imagePath">Image Url</label>
+            <!-- I'll add a local reference named imagePath to that input because I want to get access to the input inside of this template and then I'll bind the source here to that local reference, so to imagePath value because that is exactly what I want to display here. With that, if we now create a new recipe and paste in our old link, now we immediately get a preview of this image. -->
             <input
               type="text"
               id="imagePath"
               formControlName="imagePath"
-              class="form-control">
+              class="form-control"
+              #imagePath>
           </div>
         </div>
       </div>
       <div class="row">
         <div class="col-sm-12">
-          <img src="" class="img-fluid">
+          <img [src]="imagePath.value" class="img-fluid">
         </div>
       </div>
       <div class="row">
@@ -73,7 +78,10 @@
                 formControlName="amount">
             </div>
             <div class="col-sm-2">
-              <button class="btn btn-danger">X</button>
+              <button
+                class="btn btn-danger"
+                type="button"
+                (click)="onDeleteIngredient(i)">X</button>
             </div>
           </div>
           <hr>
