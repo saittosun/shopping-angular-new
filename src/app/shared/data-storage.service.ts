@@ -40,7 +40,7 @@ export class DataStorageService {
             return {
               ...recipe,
               ingredients: recipe.ingredients ? recipe.ingredients : []
-            }
+            };
           });
         }),
         // tslint:disable-next-line:max-line-length
