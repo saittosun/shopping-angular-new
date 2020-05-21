@@ -24,13 +24,17 @@
       <ul class="navbar-nav" appDropdown>
         <li class="nav-item dropdown">
           <a class="nav-link dropdown-toggle" style="cursor: pointer;" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-            Dropdown
+            Manage
           </a>
           <div class="dropdown-menu"  aria-labelledby="navbarDropdown">
-            <a class="dropdown-item" style="cursor: pointer;">Action</a>
-            <a class="dropdown-item" style="cursor: pointer;">Another action</a>
-            <div class="dropdown-divider"></div>
-            <a class="dropdown-item" style="cursor: pointer;">Something else here</a>
+            <a
+              class="dropdown-item"
+              style="cursor: pointer;"
+              (click)="onSaveData()">Save Data</a>
+            <a
+              class="dropdown-item"
+              style="cursor: pointer;"
+              >Fetch Data</a>
           </div>
         </li>
       </ul>
