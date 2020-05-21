@@ -10,24 +10,26 @@ import { Subject } from 'rxjs';
 export class RecipeService {
   recipesChanged = new Subject<Recipe[]>();
 
-  private recipes: Recipe[] = [
-    new Recipe(
-      'a test recipe',
-      'this is first one',
-      'https://cdn.pixabay.com/photo/2016/06/15/19/09/food-1459693_960_720.jpg',
-      [
-        new Ingredient('meat', 1),
-        new Ingredient('French Fries', 20)
-      ]),
-    new Recipe(
-      'an another recipe',
-      'this is first one',
-      'https://upload.wikimedia.org/wikipedia/commons/1/15/Recipe_logo.jpeg',
-      [
-        new Ingredient('Buns', 2),
-        new Ingredient('Meat', 1)
-      ])
-  ];
+  // private recipes: Recipe[] = [
+  //   new Recipe(
+  //     'a test recipe',
+  //     'this is first one',
+  //     'https://cdn.pixabay.com/photo/2016/06/15/19/09/food-1459693_960_720.jpg',
+  //     [
+  //       new Ingredient('meat', 1),
+  //       new Ingredient('French Fries', 20)
+  //     ]),
+  //   new Recipe(
+  //     'an another recipe',
+  //     'this is first one',
+  //     'https://upload.wikimedia.org/wikipedia/commons/1/15/Recipe_logo.jpeg',
+  //     [
+  //       new Ingredient('Buns', 2),
+  //       new Ingredient('Meat', 1)
+  //     ])
+  // ];
+
+  private recipes: Recipe[] = [];
   constructor(private shoppingListService: ShoppingListService) { }
 
   setRecipes(recipes: Recipe[]) {
