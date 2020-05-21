@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { RecipeService } from './recipe.service';
+import { Recipe } from '../recipe/recipe.model';
 
 @Injectable({
   providedIn: 'root'
@@ -24,6 +25,17 @@ export class DataStorageService {
       )
       .subscribe(response => {
         console.log(response);
+      });
+  }
+
+  // tslint:disable-next-line:max-line-length
+  // just as before, the question is, where do we want to subscribe? And the answer is, where are we interested in the response? Are we interested in the header component? Well not really in my opinion. What would we do with the recipes here, we're not using the recipes in the header? So I'm not really caring about the recipes here and hence there is no strong reason to subscribe here. Instead, it would be fine to just subscribe in the data storage service where we already inject the recipes service because maybe we can do something with the recipes service then to push or to move our fetched recipes into that recipes service which in the end is the place where we do manage our recipes.
+  fetchRecipes() {
+    this.http
+      .get<Recipe[]>('https://angular-maxi-shopping.firebaseio.com/recipes.json')
+      .subscribe(recipes => {
+        // console.log(recipes);
+        this.recipeService.setRecipes(recipes);
       });
   }
 }
