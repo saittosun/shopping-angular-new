@@ -10,8 +10,13 @@
         <input type="password" id="password" class="form-control">
       </div>
       <div>
-        <button class="btn btn-primary">Sign Up</button> |
-        <button class="btn btn-primary">Switch to Login</button>
+        <!-- this button should submit the form. The other button here which switches modes should be changed to type button so that it doesn't submit that form here because if you don't set a type, clicking that button which is inside of the form will actually submit it and therefore if Angular doesn't step in, it will send an unnecessary HTTP request into the void and even if Angular steps in and prevents this submission, it will trigger the form submission in Angular nonetheless and we certainly don't want to do that for this button, only for the first one. So now we have that first button changed, the second button here, this text of course also has to change based on the mode we're in because if we are in login mode, then we can switch to sign up mode. -->
+        <button
+          class="btn btn-primary"
+          type="submit">{{isLoginMode ? 'Login': 'Sign Up'}}</button> |
+        <button
+          class="btn btn-primary"
+          (click)="onSwitchMode()">Switch to {{isLoginMode ? 'Sign In' : 'Login'}}</button>
       </div>
     </form>
   </div>
