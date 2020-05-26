@@ -8,14 +8,16 @@
       <ul class="navbar-nav mr-auto">
         <li
           class="nav-item"
-          routerLinkActive="active">
+          routerLinkActive="active"
+          *ngIf="isAuthenticated">
           <a
             routerLink="/recipes"
             class="nav-link">Recipes</a>
         </li>
         <li
           class="nav-item"
-          routerLinkActive="active">
+          routerLinkActive="active"
+          *ngIf="!isAuthenticated">
           <a
             routerLink="/auth"
             class="nav-link">Authenticate</a>
@@ -29,7 +31,10 @@
         </li>
       </ul>
       <ul class="navbar-nav" appDropdown>
-        <li class="nav-item dropdown">
+        <li *ngIf="isAuthenticated">
+          <a style="cursor: pointer;" class="nav-link">Logout</a>
+        </li>
+        <li class="nav-item dropdown" *ngIf="isAuthenticated">
           <a class="nav-link dropdown-toggle" style="cursor: pointer;" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
             Manage
           </a>

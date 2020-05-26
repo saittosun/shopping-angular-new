@@ -20,6 +20,7 @@ export interface AuthResponseData {
 export class AuthService {
   // tslint:disable-next-line:max-line-length
   // now with that, the idea of course is that we emit a new user, we next a new user, whenever we have one we login or also when we logout, when we clear the user, when the user becomes invalid or the token expired.
+  // This will inform all places in the application about when our user changes.
   user = new Subject<User>();
 
   constructor(private http: HttpClient) { }
