@@ -100,6 +100,31 @@ export class AuthService {
     );
     // so to set this or emit this as our now currently logged in user in this application.
     this.user.next(user);
+    // tslint:disable-next-line:max-line-length
+    // this allows you to write an item to the local storage and to store data there. userData is basically the key by which you will be able to retrieve it later and then you have to write some data to that key, you can store some data there. Now the data I want to store there should just be that user object because that contains all the data I want to save. we have to convert it to a string. We can do that with the JSON object and the stringify method, that is built into Javascript and it simply serializes a Javascript object, it converts a Javascript object to a string version of it so to say, so to text and that text is getting stored in the local storage.
+    localStorage.setItem('userData', JSON.stringify(user));
+  }
+
+  autoLogin() {
+    const userData: {
+      email: string;
+      id: string;
+      _token: string;
+      _tokenExpirationDate: string;
+    } = JSON.parse(localStorage.getItem('userData'));
+    if (!userData) {
+      return;
+    }
+    const loadedUser = new User(
+      userData.email,
+      userData.id,
+      userData._token,
+      new Date(userData._tokenExpirationDate)
+    );
+
+    if (loadedUser.token) {
+      this.user.next(loadedUser);
+    }
   }
 
   private handleError(errorRes: HttpErrorResponse) {
