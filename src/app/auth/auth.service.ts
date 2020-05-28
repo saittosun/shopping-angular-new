@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { catchError, tap } from 'rxjs/operators';
-import { throwError, Subject } from 'rxjs';
+import { throwError, BehaviorSubject, Subject } from 'rxjs';
 import { User } from './user.model';
 
 export interface AuthResponseData {
@@ -20,8 +20,11 @@ export interface AuthResponseData {
 export class AuthService {
   // tslint:disable-next-line:max-line-length
   // now with that, the idea of course is that we emit a new user, we next a new user, whenever we have one we login or also when we logout, when we clear the user, when the user becomes invalid or the token expired.
-  // This will inform all places in the application about when our user changes.
-  user = new Subject<User>();
+  // Subject will inform all places in the application about when our user changes.
+  // tslint:disable-next-line:max-line-length
+  // it behaves just like the other subject, which means we can call next, to emit a value and we can subscribe to it to be informed about new values. The difference is that behavior subject also gives subscribers immediate access to the previously emitted value even if they haven't subscribed at the point of time that value was emitted. That means we can get access to be currently active user even if we only subscribe after that user has been emitted. So this means when we fetch data and we need that token at this point of time, even if the user logged in before that point of time which will have been the case, we get access to that latest user. Now therefore behavior subject also needs to be initialized with a starting value, which in my case will be null here, it has to be a user object and null is a valid replacement because I don't want to start off with a user.
+  user = new BehaviorSubject<User>(null);
+
 
   constructor(private http: HttpClient) { }
 

@@ -1,8 +1,10 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
+import { map, tap, take, exhaustMap } from 'rxjs/operators';
+
 import { RecipeService } from './recipe.service';
 import { Recipe } from '../recipe/recipe.model';
-import { map, tap } from 'rxjs/operators';
+import { AuthService } from '../auth/auth.service';
 
 @Injectable({
   providedIn: 'root'
@@ -10,7 +12,8 @@ import { map, tap } from 'rxjs/operators';
 export class DataStorageService {
 
   constructor(private http: HttpClient,
-              private recipeService: RecipeService) {}
+              private recipeService: RecipeService,
+              private authService: AuthService) {}
 
   storeRecipes() {
     //  this retrieves our list of recipes which are now temporarily stored in that constant.
@@ -32,23 +35,33 @@ export class DataStorageService {
   // tslint:disable-next-line:max-line-length
   // just as before, the question is, where do we want to subscribe? And the answer is, where are we interested in the response? Are we interested in the header component? Well not really in my opinion. What would we do with the recipes here, we're not using the recipes in the header? So I'm not really caring about the recipes here and hence there is no strong reason to subscribe here. Instead, it would be fine to just subscribe in the data storage service where we already inject the recipes service because maybe we can do something with the recipes service then to push or to move our fetched recipes into that recipes service which in the end is the place where we do manage our recipes.
   fetchRecipes() {
-    return this.http
-      .get<Recipe[]>('https://angular-maxi-shopping.firebaseio.com/recipes.json')
-      .pipe(
-        map(recipes => {
-          return recipes.map(recipe => {
-            return {
-              ...recipe,
-              ingredients: recipe.ingredients ? recipe.ingredients : []
-            };
+    // tslint:disable-next-line:max-line-length
+    // I only want to take one value from that observable and thereafter, it should automatically unsubscribe. So this manages the subscription for me, gives me the latest user and unsubscribes and I'm not getting future users because I just want to get them on demand when fetch recipes is called, so whenever this code executes. I don't want to set up an ongoing subscription which gives me users at a point of time I don't need them anymore.
+    // tslint:disable-next-line:max-line-length
+    // It waits for the first observable, for the user observable to complete which will happen after we took the latest user. Thereafter, it gives us that user, so in exhaustMap we pass in a function, there we get the data from that previous observable and now we return a new observable in there which will then replace our previous observable in that entire observable chain.
+
+    return this.authService.user.pipe(
+      take(1),
+      exhaustMap(user => {
+        return this.http
+          .get<Recipe[]>('https://angular-maxi-shopping.firebaseio.com/recipes.json',
+          {
+            params: new HttpParams().set('auth', user.token)
           });
-        }),
-        // tslint:disable-next-line:max-line-length
-        // The tap operator allows us to execute some code here in place without altering the data that is funneled through that observable. So in here, we will get our recipes array indeed and I will simply set the recipes in a service then as before but now I will not subscribe here anymore but instead, return this call to this HTTP service and that means that in the header component, we now have to subscribe here and you don't even have to pass in a function if you're not caring about the response anyways.
-        tap(recipes => {
-          // console.log(recipes);
-          this.recipeService.setRecipes(recipes);
-        })
-      );
+      }),
+      map(recipes => {
+        return recipes.map(recipe => {
+          return {
+            ...recipe,
+            ingredients: recipe.ingredients ? recipe.ingredients : []
+          };
+        });
+      }),
+      // tslint:disable-next-line:max-line-length
+      // The tap operator allows us to execute some code here in place without altering the data that is funneled through that observable. So in here, we will get our recipes array indeed and I will simply set the recipes in a service then as before but now I will not subscribe here anymore but instead, return this call to this HTTP service and that means that in the header component, we now have to subscribe here and you don't even have to pass in a function if you're not caring about the response anyways.
+      tap(recipes => {
+        // console.log(recipes);
+        this.recipeService.setRecipes(recipes);
+      }));
   }
 }
