@@ -3,6 +3,7 @@ import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { catchError, tap } from 'rxjs/operators';
 import { throwError, BehaviorSubject, Subject } from 'rxjs';
 import { User } from './user.model';
+import { Router } from '@angular/router';
 
 export interface AuthResponseData {
   kind: string;
@@ -26,7 +27,13 @@ export class AuthService {
   user = new BehaviorSubject<User>(null);
 
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient,
+              private router: Router) { }
+
+  logout() {
+    this.user.next(null);
+    this.router.navigate(['/auth']);
+  }
 
   //  it should send the request to that sign up url therefore we will need the httpclient to be injected.
   signup(email: string, password: string) {
