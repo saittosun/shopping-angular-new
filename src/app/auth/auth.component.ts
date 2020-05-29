@@ -17,6 +17,10 @@ export class AuthComponent implements OnInit {
   constructor(private authService: AuthService,
               private router: Router) { }
 
+  onHandleError() {
+    this.error = null;
+  }
+
   onSwitchMode() {
     this.isLoginMode = !this.isLoginMode;
   }
