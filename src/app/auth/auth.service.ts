@@ -25,15 +25,10 @@ export class AuthService {
   // tslint:disable-next-line:max-line-length
   // it behaves just like the other subject, which means we can call next, to emit a value and we can subscribe to it to be informed about new values. The difference is that behavior subject also gives subscribers immediate access to the previously emitted value even if they haven't subscribed at the point of time that value was emitted. That means we can get access to be currently active user even if we only subscribe after that user has been emitted. So this means when we fetch data and we need that token at this point of time, even if the user logged in before that point of time which will have been the case, we get access to that latest user. Now therefore behavior subject also needs to be initialized with a starting value, which in my case will be null here, it has to be a user object and null is a valid replacement because I don't want to start off with a user.
   user = new BehaviorSubject<User>(null);
-
+  private tokenExpirationTimer: any;
 
   constructor(private http: HttpClient,
               private router: Router) { }
-
-  logout() {
-    this.user.next(null);
-    this.router.navigate(['/auth']);
-  }
 
   //  it should send the request to that sign up url therefore we will need the httpclient to be injected.
   signup(email: string, password: string) {
@@ -61,6 +56,19 @@ export class AuthService {
           );
         })
       );
+  }
+
+  logout() {
+    this.user.next(null);
+    this.router.navigate(['/auth']);
+    // tslint:disable-next-line:max-line-length
+    // if a user logs out, we certainly have to clear everything about that user in our application and that includes the local storage.  if we call remove item and we just remove that user data key and the data that's stored there.
+    // localStorage.clear();
+    localStorage.removeItem('userData');
+    if (this.tokenExpirationTimer) {
+      clearTimeout(this.tokenExpirationTimer);
+    }
+    this.tokenExpirationTimer = null;
   }
 
   login(email: string, password: string) {
@@ -100,9 +108,17 @@ export class AuthService {
     );
     // so to set this or emit this as our now currently logged in user in this application.
     this.user.next(user);
+    this.autoLogout(expiresIn * 1000);
     // tslint:disable-next-line:max-line-length
     // this allows you to write an item to the local storage and to store data there. userData is basically the key by which you will be able to retrieve it later and then you have to write some data to that key, you can store some data there. Now the data I want to store there should just be that user object because that contains all the data I want to save. we have to convert it to a string. We can do that with the JSON object and the stringify method, that is built into Javascript and it simply serializes a Javascript object, it converts a Javascript object to a string version of it so to say, so to text and that text is getting stored in the local storage.
     localStorage.setItem('userData', JSON.stringify(user));
+  }
+
+  autoLogout(expirationDuration: number) {
+    console.log(expirationDuration);
+    this.tokenExpirationTimer = setTimeout(() => {
+      this.logout();
+    }, expirationDuration);
   }
 
   autoLogin() {
@@ -124,6 +140,10 @@ export class AuthService {
 
     if (loadedUser.token) {
       this.user.next(loadedUser);
+      const expirationDuration =
+        new Date(userData._tokenExpirationDate).getTime() -
+        new Date().getTime();
+      this.autoLogout(expirationDuration);
     }
   }
 
