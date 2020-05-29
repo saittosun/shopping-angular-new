@@ -1,8 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ComponentFactoryResolver } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { AuthService, AuthResponseData } from './auth.service';
 import { Observable } from 'rxjs';
 import { Router } from '@angular/router';
+import { AlertComponent } from '../shared/alert/alert.component';
 
 @Component({
   selector: 'app-auth',
@@ -15,7 +16,8 @@ export class AuthComponent implements OnInit {
   error: string = null;
 
   constructor(private authService: AuthService,
-              private router: Router) { }
+              private router: Router,
+              private componentFactoryResolver: ComponentFactoryResolver) { }
 
   onHandleError() {
     this.error = null;
@@ -48,11 +50,19 @@ export class AuthComponent implements OnInit {
       },
       errorMessage => {
         this.error = errorMessage;
+        this.showErrorAlert(errorMessage);
         this.isLoading = false;
       }
     );
 
     form.reset();
+  }
+
+  private showErrorAlert(message: string) {
+    // with the component factory resolver injected, in show error alert, you now use that resolver to get access to a component factory,
+    // tslint:disable-next-line:max-line-length
+    // This method here will return a component factory or to be precise, an alert component factory, not the component itself, just the factory.
+    const alertCompany = this.componentFactoryResolver.resolveComponentFactory(AlertComponent)
   }
 
   ngOnInit(): void {
