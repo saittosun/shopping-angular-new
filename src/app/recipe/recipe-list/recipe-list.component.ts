@@ -23,7 +23,7 @@ export class RecipeListComponent implements OnInit, OnDestroy {
       (recipes: Recipe[]) => {
         this.recipes = recipes;
       }
-    )
+    );
     this.recipes = this.recipeService.getRecipes();
   }
 
@@ -32,7 +32,7 @@ export class RecipeListComponent implements OnInit, OnDestroy {
   }
 
   onNewRecipe() {
-    this.router.navigate(['new'], {relativeTo: this.route})
+    this.router.navigate(['new'], {relativeTo: this.route});
   }
 
 }
