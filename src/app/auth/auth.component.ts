@@ -1,9 +1,10 @@
-import { Component, OnInit, ComponentFactoryResolver } from '@angular/core';
+import { Component, OnInit, ComponentFactoryResolver, ViewChild } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { AuthService, AuthResponseData } from './auth.service';
 import { Observable } from 'rxjs';
 import { Router } from '@angular/router';
 import { AlertComponent } from '../shared/alert/alert.component';
+import { PlaceholderDirective } from '../shared/placeholder/placeholder.directive';
 
 @Component({
   selector: 'app-auth',
@@ -14,6 +15,8 @@ export class AuthComponent implements OnInit {
   isLoginMode = true;
   isLoading = false;
   error: string = null;
+  // we get access to that directive we use in the template and we store that in alert host.
+  @ViewChild(PlaceholderDirective, {static: false}) alertHost: PlaceholderDirective;
 
   constructor(private authService: AuthService,
               private router: Router,
@@ -62,7 +65,11 @@ export class AuthComponent implements OnInit {
     // with the component factory resolver injected, in show error alert, you now use that resolver to get access to a component factory,
     // tslint:disable-next-line:max-line-length
     // This method here will return a component factory or to be precise, an alert component factory, not the component itself, just the factory.
-    const alertCompany = this.componentFactoryResolver.resolveComponentFactory(AlertComponent)
+    const alertCmpCompany = this.componentFactoryResolver.resolveComponentFactory(AlertComponent);
+    const hostViewContainerRef = this.alertHost.viewContainerRef;
+    hostViewContainerRef.clear();
+
+    hostViewContainerRef.createComponent(alertCmpCompany);
   }
 
   ngOnInit(): void {
