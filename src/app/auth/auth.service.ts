@@ -4,6 +4,7 @@ import { catchError, tap } from 'rxjs/operators';
 import { throwError, BehaviorSubject, Subject } from 'rxjs';
 import { User } from './user.model';
 import { Router } from '@angular/router';
+import { environment } from 'src/environments/environment';
 
 export interface AuthResponseData {
   kind: string;
@@ -36,7 +37,8 @@ export class AuthService {
     // This interface we just generated between these angled brackets so that we inform typescript that this post request will yield as a response in which body we find data in this format.
     return this.http
       .post<AuthResponseData>(
-        'https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=AIzaSyDpbMNSaO0FaHu31J5JBul6256nHi1jWHA',
+        'https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=' +
+        environment.firebaseAPIKey,
         {
           email,
           password,
@@ -74,7 +76,8 @@ export class AuthService {
   login(email: string, password: string) {
     return this.http
       .post<AuthResponseData>(
-        'https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=AIzaSyDpbMNSaO0FaHu31J5JBul6256nHi1jWHA',
+        'https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=' +
+        environment.firebaseAPIKey,
         {
           email,
           password,
