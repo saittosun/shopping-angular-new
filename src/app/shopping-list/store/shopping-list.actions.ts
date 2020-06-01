@@ -9,5 +9,6 @@ export const ADD_INGREDIENT = 'ADD_INGREDIENT';
 export class AddIngredient implements Action {
   // that is a TypeScript feature which indicates to TypeScript that this must never be changed from outside
   readonly type = ADD_INGREDIENT;
-  payload: Ingredient;
+
+  constructor(public payload: Ingredient) {}
 }
