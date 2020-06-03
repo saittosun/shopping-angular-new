@@ -49,17 +49,19 @@ export function shoppingListReducer(
       };
     case ShoppingListActions.UPDATE_INGREDIENT:
       // let's get that one ingredient that we want to edit.
-      const ingredient = state.ingredients[action.payload.index];
+      const ingredient = state.ingredients[state.editedIngredientIndex];
       const updatedIngredient = {
         ...ingredient,
         // I'm copying the old ingredients properties to then overwrite them here
-        ...action.payload.ingredient
+        ...action.payload
       };
       const updatedIngredients = [...state.ingredients];
-      updatedIngredients[action.payload.index] = updatedIngredient;
+      updatedIngredients[state.editedIngredientIndex] = updatedIngredient;
       return {
         ...state,
-        ingredients: updatedIngredients
+        ingredients: updatedIngredients,
+        editedIngredientIndex: -1,
+        editedIngredient: null
       };
     case ShoppingListActions.DELETE_INGREDIENT:
       return {
@@ -67,7 +69,7 @@ export function shoppingListReducer(
         // tslint:disable-next-line:max-line-length
         // Filter will always return a new array, so it will automatically give us a copy and filter is a function built into Javascript that will take an array, run a certain function which you pass in as an argument on every element in the array and if your function which you pass into filter if that function returns true, then the element for which it's executing this will be part of the new array filter returns, otherwise it will not. I want to return true for every element where the index is not equal to the index we're looking for because if I return true, then the element will be kept, if I return false, it will be filtered out and I only want to filter out one element and that is the element with the index we're trying to delete.
         ingredients: state.ingredients.filter((ingredient, ingredietIndex) => {
-          return ingredietIndex !== action.payload;
+          return ingredietIndex !== state.editedIngredientIndex;
         })
       };
       case ShoppingListActions.START_EDIT:
