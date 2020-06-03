@@ -3,7 +3,6 @@ import { Subscription, Observable } from 'rxjs';
 import { Store } from '@ngrx/store';
 
 import { Ingredient } from './../shared/ingredient.model';
-import { ShoppingListService } from '../shared/shopping-list.service';
 import { LoggingService } from '../logging.service';
 import * as fromShoppingList from './store/shopping-list.reducer';
 import * as ShoppingListActions from './store/shopping-list.actions';
@@ -17,8 +16,7 @@ export class ShoppingListComponent implements OnInit, OnDestroy {
   ingredients: Observable<{ingredients: Ingredient[]}>;
   // private igChangeSub: Subscription;
 
-  constructor(private shoppingListService: ShoppingListService,
-              private loggingService: LoggingService,
+  constructor(private loggingService: LoggingService,
               // tslint:disable-next-line:max-line-length
               // we're not using Redux but NgRx because it gives us some extra features and deeper integration into Angular and for example, it gives us an injectable store that makes it easy for us to access our application state which is stored in that store after all.
               private store: Store<fromShoppingList.AppState>
