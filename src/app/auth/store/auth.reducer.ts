@@ -14,6 +14,7 @@ export function authReducer(
   // tslint:disable-next-line:max-line-length
   // Now this double name might be confusing but again, the first part here is just this container name of all the things that are exported by the file and then with a dot we accessed the different exported things, like our string identifiers or this auth actions union type.
   action: AuthActions.AuthActions) {
+  console.log(state);
   switch (action.type) {
     case AuthActions.LOGIN:
       const user = new User(
