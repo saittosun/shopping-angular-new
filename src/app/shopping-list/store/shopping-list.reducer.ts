@@ -1,3 +1,4 @@
+// tslint:disable-next-line:max-line-length
 // depending on the type which we have, we return a new state and that is how a reducer function always works, data in data out, no asynchronous code, it's all synchronous, so we only have synchronous code in here and we always return a new object which will be used to replace the old state for this part of the application, so for the shopping list here and this return state is what NgRx will in the end register for the shopping list slice of the overall AppState, of the App store it manages here. So this is what we added, we added this reducer and regarding the actions, we also added an actions file where we for one defined unique identifiers for all our actions, these are simply strings that identify each action and then the action itself is not just this identifier but it's a complete object based on classes we define in here. Each action needs to have a type property where we do store the string identifier for the action but in addition, we might also have a payload, so a property which can be set to attach data to that action and we needed that for example for adding an ingredient, though we also have an action, the delete action which has no extra data because it doesn't need any. Now this entire setup was really a lot of work, we have to be honest there, adding the reducer, adding the actions, injecting the store, dispatching actions, that is a lot of overhead work and using the normal shopping list service definitely was easier there and therefore using a service with subjects is a more than fine alternative to using NgRx. So it's mainly that initial setup that requires a lot of work, once that is set up it's actually quite fast to work with NgRx.
 import { Ingredient } from '../../shared/ingredient.model';
 import * as ShoppingListActions from './shopping-list.actions';
@@ -6,10 +7,6 @@ export interface State {
   ingredients: Ingredient[];
   editedIngredient: Ingredient;
   editedIngredientIndex: number;
-}
-
-export interface AppState {
-  shoppingList: State;
 }
 
 const initialState = {
