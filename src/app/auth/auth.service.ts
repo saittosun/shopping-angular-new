@@ -5,6 +5,9 @@ import { throwError, BehaviorSubject, Subject } from 'rxjs';
 import { User } from './user.model';
 import { Router } from '@angular/router';
 import { environment } from 'src/environments/environment';
+import { Store } from '@ngrx/store';
+import * as fromApp from '../store/app.reducer';
+import * as AuthActions from './store/auth.actions';
 
 export interface AuthResponseData {
   kind: string;
@@ -29,7 +32,8 @@ export class AuthService {
   private tokenExpirationTimer: any;
 
   constructor(private http: HttpClient,
-              private router: Router) { }
+              private router: Router,
+              private store: Store<fromApp.AppState>) { }
 
   //  it should send the request to that sign up url therefore we will need the httpclient to be injected.
   signup(email: string, password: string) {
@@ -61,7 +65,8 @@ export class AuthService {
   }
 
   logout() {
-    this.user.next(null);
+    // this.user.next(null);
+    this.store.dispatch(new AuthActions.Logout());
     this.router.navigate(['/auth']);
     // tslint:disable-next-line:max-line-length
     // if a user logs out, we certainly have to clear everything about that user in our application and that includes the local storage.  if we call remove item and we just remove that user data key and the data that's stored there.
@@ -97,7 +102,11 @@ export class AuthService {
       );
   }
 
-  private handleAuthentication(email: string, userId: string, token: string, expiresIn: number) {
+  private handleAuthentication(
+    email: string,
+    userId: string,
+    token: string,
+    expiresIn: number) {
     // tslint:disable-next-line:max-line-length
     // this is the timestamp in milliseconds, here therefore we need to multiply the seconds with 1000 to convert this to milliseconds as well and this gives us the expiration date in milliseconds and by wrapping this with new date as I'm doing it, this will convert it back to a date object which is a concrete timestamp in a date object form and not in milliseconds anymore. So this is the expiration date which we now can pass as a fourth argument here to that user constructor, here it is.
     const expirationDate = new Date(
@@ -110,10 +119,16 @@ export class AuthService {
       expirationDate
     );
     // so to set this or emit this as our now currently logged in user in this application.
-    this.user.next(user);
+    // this.user.next(user);
+    this.store.dispatch(new AuthActions.Login({
+      email,
+      userId,
+      token,
+      expirationDate
+    }));
     this.autoLogout(expiresIn * 1000);
     // tslint:disable-next-line:max-line-length
-    // this allows you to write an item to the local storage and to store data there. userData is basically the key by which you will be able to retrieve it later and then you have to write some data to that key, you can store some data there. Now the data I want to store there should just be that user object because that contains all the data I want to save. we have to convert it to a string. We can do that with the JSON object and the stringify method, that is built into Javascript and it simply serializes a Javascript object, it converts a Javascript object to a string version of it so to say, so to text and that text is getting stored in the local storage.
+    // we need the user object here because we do access local storage and that is something you should not do from inside your reducer, it's not asynchronous code but it's a so-called side effect still, so it is something that is not directly connected to your state, it's something you do besides updating your AppState and therefore this should not go into the reducer, it wouldn't break the reducer but it would be considered a bad practice and I will show you how to handle such side effects with NgRx later.
     localStorage.setItem('userData', JSON.stringify(user));
   }
 
@@ -142,7 +157,13 @@ export class AuthService {
     );
 
     if (loadedUser.token) {
-      this.user.next(loadedUser);
+      // this.user.next(loadedUser);
+      this.store.dispatch(new AuthActions.Login({
+        email: loadedUser.email,
+        userId: loadedUser.id,
+        token: loadedUser.token,
+        expirationDate: new Date(userData._tokenExpirationDate)
+      }));
       const expirationDuration =
         new Date(userData._tokenExpirationDate).getTime() -
         new Date().getTime();
