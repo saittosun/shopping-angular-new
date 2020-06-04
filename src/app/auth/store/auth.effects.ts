@@ -1,12 +1,12 @@
-import {Actions, ofType} from '@ngrx/effects';
-import {HttpClient} from '@angular/common/http';
-import { switchMap, catchError, map } from 'rxjs/operators';
-import { Effect } from '@ngrx/effects';
+import { Actions, ofType, Effect } from '@ngrx/effects';
+import { HttpClient } from '@angular/common/http';
+import { switchMap, catchError, map, tap } from 'rxjs/operators';
+import { of } from 'rxjs';
+import { Injectable } from '@angular/core';
+import { Router } from '@angular/router';
 
 import {environment} from '../../../environments/environment';
 import * as AuthActions from './auth.actions';
-import { of } from 'rxjs';
-import { Injectable } from '@angular/core';
 
 export interface AuthResponseData {
   kind: string;
@@ -52,14 +52,30 @@ export class AuthEffects {
           const expirationDate = new Date(
             new Date().getTime() + +resData.expiresIn * 1000
           );
-          return of(new AuthActions.Login({
+          return new AuthActions.Login({
             email: resData.email,
             userId: resData.localId,
             token: resData.idToken,
             expirationDate
-          }));
+          });
         }),
-        catchError(error => {
+        catchError(errorRes => {
+          let errorMessage = 'An unknown error occured!';
+          if (!errorRes.error || !errorRes.error.error) {
+            return of(new AuthActions.LoginFail(errorMessage));
+          }
+          switch (errorRes.error.error.message) {
+            case 'EMAIL_EXISTS':
+              errorMessage = 'This email exists already!';
+              break;
+            case 'EMAIL_NOT_FOUND':
+              errorMessage = 'This email does not exist!';
+              break;
+            case 'INVALID_PASSWORD':
+              errorMessage = 'This password is not correct';
+              break;
+          }
+          return of(new AuthActions.LoginFail(errorMessage));
           // tslint:disable-next-line:max-line-length
           // most importantly and that is super important to understand, here we have to return a non-error observable so that our overall stream doesn't die and since switchMap returns the result of this inner observable stream as a new observable to the outer chain here, returning a non-error observable in catch error is crucial, so that this erroneous observable in here still yields a non-error observable which is picked up by switchMap which is then returned to this overall stream, to this overall observable chain.
           // Of which is simply a utility function for creating a new observable, a new observable without an error
@@ -69,6 +85,17 @@ export class AuthEffects {
     })
   );
 
+  // tslint:disable-next-line:max-line-length
+  // What's really important here though is that this is an effect which does not dispatch a new action at the end. I mentioned that typically, your effects do that, they typically return an observable which holds a new effect which should be dispatched, this effect doesn't and to let NgRx effect know about that and avoid errors, you have to pass an object to your @effect decorator where you set dispatch to false and this lets @ngrx/effects know that this is an effect which will actually not yield a dispatchable action at the end and then you can do that just like this. Also note that I used the login action which only fires on a successful login, not as soon as we start the login process.
+  @Effect({dispatch: false})
+  authSuccess = this.actions$.pipe(
+    ofType(AuthActions.LOGIN),
+    tap(() => {
+      this.router.navigate(['/']);
+    })
+  )
+
   constructor(private actions$: Actions,
-              private http: HttpClient) {}
+              private http: HttpClient,
+              private router: Router) {}
 }
