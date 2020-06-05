@@ -7,7 +7,7 @@ export interface State {
   loading: boolean;
 }
 
-const initialState = {
+const initialState: State = {
   user: null,
   authError: null,
   loading: false
@@ -15,12 +15,10 @@ const initialState = {
 
 export function authReducer(
   state = initialState,
-  // tslint:disable-next-line:max-line-length
-  // Now this double name might be confusing but again, the first part here is just this container name of all the things that are exported by the file and then with a dot we accessed the different exported things, like our string identifiers or this auth actions union type.
-  action: AuthActions.AuthActions) {
-  console.log(state);
+  action: AuthActions.AuthActions
+) {
   switch (action.type) {
-    case AuthActions.LOGIN:
+    case AuthActions.AUTHENTICATE_SUCCESS:
       const user = new User(
         action.payload.email,
         action.payload.userId,
@@ -39,18 +37,24 @@ export function authReducer(
         user: null
       };
     case AuthActions.LOGIN_START:
+    case AuthActions.SIGNUP_START:
       return {
         ...state,
         authError: null,
         loading: true
       };
-    case AuthActions.LOGIN_FAIL:
+    case AuthActions.AUTHENTICATE_FAIL:
       return {
         ...state,
         user: null,
         authError: action.payload,
         loading: false
-      }
+      };
+    case AuthActions.CLEAR_ERROR:
+      return {
+        ...state,
+        authError: null
+      };
     default:
       return state;
   }
