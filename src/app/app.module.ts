@@ -3,6 +3,7 @@ import { NgModule } from '@angular/core';
 import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { StoreModule } from '@ngrx/store';
 import { EffectsModule } from '@ngrx/effects';
+import { StoreRouterConnectingModule } from '@ngrx/router-store';
 
 import { AppComponent } from './app.component';
 import { HeaderComponent } from './header/header.component';
@@ -29,6 +30,7 @@ import { environment } from 'src/environments/environment';
       // this production property which is false during development but true during production and therefore with log only
       logOnly: environment.production
     }),
+    StoreRouterConnectingModule.forRoot(),
     SharedModule
   ],
   providers: [
